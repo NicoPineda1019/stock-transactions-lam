@@ -5,7 +5,7 @@ const strategies = {
     user : new User(),
     material: new Material()
 }
-class StrategyFactory {
+export class StrategyFactory {
     getStrategy(strategy){
         const classStrategy = strategies[strategy]
         if (classStrategy) return classStrategy
