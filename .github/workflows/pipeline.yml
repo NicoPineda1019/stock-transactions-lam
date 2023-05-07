@@ -1,0 +1,67 @@
+name: stock-transactions-lambda
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+jobs:
+  deployDEV:
+    # The type of runner that the job will run on
+    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm install and build
+        run: |
+          npm ci
+          npm run build --if-present
+        env:
+          CI: true
+      - name: Create src.zip
+        run: zip -r lambda_function.zip ./ -x \*.md \*.gitignore ./node_modules/\* ./tests/\* \*.json \*.yaml 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: version aws
+        run: aws --version
+      - name: lambda configuration deploy
+        run: |
+          aws lambda update-function-configuration \
+          --function-name stock-transactions-lam-dev \
+          --handler index.handler \
+          --timeout 90 \
+          --runtime nodejs${{ matrix.node-version }} \
+          --layers arn:aws:lambda:us-east-1:227205496403:layer:mysql-layer:2 \
+      - name: lambda status
+        run: |
+          NAME="stock-transactions-lam-dev"
+          RESPONSE=$(aws lambda get-function-configuration --function-name ${NAME} | jq .LastUpdateStatus)
+          while [[ '"Successful"' != $RESPONSE ]]
+            do
+              RESPONSE=$(aws lambda get-function-configuration --function-name ${NAME} | jq .LastUpdateStatus)
+              echo "respuesta -> : ${RESPONSE}"
+              if [[ '"Successful"' == $RESPONSE ]];
+                then
+                  echo "RESPONSE del then: ${RESPONSE}"
+                  break
+              fi
+            done
+      - name: lambda code deploy
+        run: |
+          aws lambda update-function-code \
+          --function-name stock-transactions-lam-dev \
+          --zip-file fileb://lambda_function.zip
