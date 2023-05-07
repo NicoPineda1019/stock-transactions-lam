@@ -38,10 +38,10 @@ export class StockSerializable extends Context {
         const values = this.mapGetItem(request)
         const responseQuery = await this.db.query(sqlString, values)
             .then(resp => {
-                console.log(`Response getItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
+                console.log(`Response getItem in table => ${this.nameTable} : ${resp.length} elements`)
                 return {
                     code: 200,
-                    msg: 'Item inserted with id => ' + resp
+                    msg: resp
                 }
             })
             .catch(err => {
