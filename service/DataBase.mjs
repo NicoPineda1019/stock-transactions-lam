@@ -1,12 +1,14 @@
 import mysql from 'mysql';
-export class DataBase {
-    constructor() {
-        this.db = mysql.createConnection({
+const dB = mysql.createConnection({
             host: 'stock-capired.cu68nawuqxr9.us-east-1.rds.amazonaws.com',
             user: 'admin',
             password: 'CapiredStock2023*',
             database: 'db-capired-dev'
-        })
+})
+
+export class DataBase {
+    constructor() {
+        this.db = dB
     }
     connection() {
         return new Promise((resolve, reject) => {
@@ -26,6 +28,17 @@ export class DataBase {
                 if (err) reject(err)
                 else resolve('Disconnected successfully!')
             });
+        })
+    }
+    query(queryString, values = []) {
+        return new Promise((resolve, reject) => {
+            this.db.query(queryString, values, function (error, results, fields) {
+                if (error) reject(error)
+                resolve(results)
+  // error will be an Error if one occurred during the query
+  // results will contain the results of the query
+  // fields will contain information about the returned results fields (if any)
+});
         })
     }
 }

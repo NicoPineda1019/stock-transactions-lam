@@ -9,10 +9,10 @@ export const handler = async (event) => {
     console.log('State =>', dB.db.state)
     console.log('threadId =>', dB.db.threadId)
     await dB.connection()
-        .then((resp) => console.log('resp ', resp.state))
+        .then((resp) => console.log('resp ', resp['_handshakeInitializationPacket'].threadId))
         .catch((err) => console.error(err.stack))
     // TODO implement
-    const factory = new StrategyFactory('user')
+    const factory = new StrategyFactory().getStrategy('stock-serializable')
     const context = new Context(factory)
     context.insertItem()
     await dB.disconnect()
