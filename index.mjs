@@ -7,7 +7,7 @@ var connection = mysql.createConnection({
 })
 
 export const handler = async(event) => {
-    console.log('Hola mundo')
+    console.log('Hola mundo!!!!')
   await new Promise((resolve,reject) => {
     connection.connect(function(err) {
   if (err) {
