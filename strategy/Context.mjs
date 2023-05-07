@@ -14,4 +14,7 @@ export class Context {
     async insertItem(request, callback){
         await this.strategy.insertItem(request, callback)
     }
+    async getItem(request, callback){
+        await this.strategy.getItem(request, callback)
+    }
 }

@@ -15,7 +15,33 @@ export class StockSerializable extends Context {
                 console.log(`Response insertItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
                 return {
                     code: 200,
-                    msg: resp.OkPacket?.insertId
+                    msg: 'Item inserted with id => ' + resp?.insertId
+                }
+            })
+            .catch(err => {
+                console.error(err)
+                return {
+                    code: 500,
+                    msg: err.stack
+                }
+            })
+        callback(null, response(responseQuery.code, responseQuery.msg))
+    }
+    async getItem(request, callback) {
+        const sqlString = `SELECT c.codigo, c.nombre as 'nombre_equipo', a.fecha_cargue, a.fecha_actualizacion, 
+        a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario' 
+        FROM ${this.nameTable} as a 
+        INNER JOIN ESTADO as b ON a.id_estado = b.id 
+        INNER JOIN MATERIAL as c on a.id_material = c.id
+        INNER JOIN USUARIO as d on a.id_usuario = d.id
+        where a.fecha_actualizacion = ? and a.id_estado = ?`
+        const values = this.mapGetItem(request)
+        const responseQuery = await this.db.query(sqlString, values)
+            .then(resp => {
+                console.log(`Response getItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
+                return {
+                    code: 200,
+                    msg: 'Item inserted with id => ' + resp
                 }
             })
             .catch(err => {
@@ -37,5 +63,11 @@ export class StockSerializable extends Context {
             id_usuario: request.idUsuario,
             id_estado: request.idEstado
         }
+    }
+    mapGetItem(request) {
+        return [
+            request.fechaActualizacion,
+            request.idEstado
+        ]
     }
 }

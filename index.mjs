@@ -30,6 +30,9 @@ export const handler = async (event, context, callback) => {
     const methodExecute = contextStrategy.getMethod(event.httpMethod)
     console.log('STARTED STRATEGY => ', strategy)
     console.log('WITH METHOD => ', methodExecute)
-    await contextStrategy[methodExecute](JSON.parse(event.body), callback)
+    const body = JSON.parse(event.body)
+    const queryParams = JSON.parse(event.queryStringParameters)
+    const request = body ? body : queryParams
+    await contextStrategy[methodExecute](request, callback)
     console.log('FINISHED METHOD => ', methodExecute)
 };
