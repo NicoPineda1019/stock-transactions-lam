@@ -34,13 +34,13 @@ export class StockSerializable extends Context {
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
         INNER JOIN MATERIAL as c on a.id_material = c.id
         INNER JOIN USUARIO as d on a.id_usuario = d.id
-        where a.fecha_actualizacion = ? and a.id_estado = ?`
+        where a.fecha_actualizacion = ? and a.id_estado IN (?)`
         const values = this.mapGetItem(request)
         const responseQuery = await this.db.query(sqlString, values)
             .then(resp => {
                 console.log(`Response getItem in table => ${this.nameTable} : ${resp.length} elements`)
                 return {
-                    code: 200,
+                    code: resp.length === 0 ? 404 : 200,
                     msg: resp
                 }
             })
@@ -65,9 +65,10 @@ export class StockSerializable extends Context {
         }
     }
     mapGetItem(request) {
+        const formatStates = request.idEstado.replaceAll(',','')
         return [
             request.fechaActualizacion,
-            request.idEstado
+            Array.from(formatStates)
         ]
     }
 }
