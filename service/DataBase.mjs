@@ -14,7 +14,7 @@ export class DataBase {
         return new Promise((resolve, reject) => {
             if (this.db.state === 'authenticated' && this.db.threadId) {
                 console.log('Already connected')
-                return resolve(this.db)
+                return resolve(this)
             }
             this.db.connect(function (err) {
                 if (err) reject(err)
