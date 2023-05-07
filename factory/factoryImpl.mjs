@@ -1,6 +1,7 @@
 import { StockSerializable } from "../strategy/StockSerializable.mjs";
-import { Material } from "../strategy/material.mjs";
-import { User } from "../strategy/user.mjs";
+import { User } from "../strategy/User.mjs";
+import { Material } from "../strategy/Material.mjs";
+
 
 const strategies = {
     user : new User(),
