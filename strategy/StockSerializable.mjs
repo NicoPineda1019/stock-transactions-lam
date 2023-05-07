@@ -12,7 +12,7 @@ export class StockSerializable extends Context {
         const values = this.mapInsertItem(request)
         const responseQuery = await this.db.query(sqlString, values)
             .then(resp => {
-                console.log(`Response insertItem in table => ${this.nameTable} : ${resp}`)
+                console.log(`Response insertItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
                 return {
                     code: 200,
                     msg: resp.OkPacket?.insertId
