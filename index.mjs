@@ -1,26 +1,9 @@
-import mysql from 'mysql';
-var connection = mysql.createConnection({
-  host     : 'stock-capired.cu68nawuqxr9.us-east-1.rds.amazonaws.com',
-  user     : 'admin',
-  password : 'CapiredStock2023*',
-  database : 'db-capired-dev'
-})
+import { DataBase } from './service/DataBase.mjs';
 
-export const handler = async(event) => {
-    console.log('Hola mundo!!!!')
-  await new Promise((resolve,reject) => {
-    connection.connect(function(err) {
-  if (err) {
-    console.error('error connecting: ' + err.stack);
-    reject(err)
-    return;
-  }
- 
-  console.log('connected as id ' + connection.threadId);
-  resolve(connection)
-});
-  }).then((resp) => ({}))
-  console.log('Fin')
+export const handler = async (event) => {
+    const db = new DataBase()
+    await db.connection().then((resp) => console.log('resp ', resp))
+        .catch((err) => console.error(err))
     // TODO implement
     const response = {
         statusCode: 200,
