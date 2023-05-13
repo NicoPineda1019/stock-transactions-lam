@@ -3,7 +3,8 @@ const dB = mysql.createConnection({
     host: 'stock-capired.cu68nawuqxr9.us-east-1.rds.amazonaws.com',
     user: 'admin',
     password: 'CapiredStock2023*',
-    database: 'db-capired-dev'
+    database: 'db-capired-dev',
+    multipleStatements: true
 })
 
 export class DataBase {

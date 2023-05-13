@@ -1,6 +1,6 @@
 import { Context } from "./Context.mjs";
 import { DataBase } from '../service/DataBase.mjs';
-import { response } from "../utils/response.mjs";
+import { paginateResponse, response } from "../utils/response.mjs";
 export class StockSerializable extends Context {
     constructor() {
         super()
@@ -28,6 +28,9 @@ export class StockSerializable extends Context {
         callback(null, response(responseQuery.code, responseQuery.msg))
     }
     async getItem(request, callback) {
+        const page = request.page ? request.page : 1;
+        const totalPage = 5
+        const offset = (page*totalPage - totalPage) + 1
         const sqlCount = `SELECT COUNT(*) as Total
         FROM ${this.nameTable} as a 
         where a.fecha_actualizacion = ? and a.id_estado IN (?)`
@@ -37,8 +40,8 @@ export class StockSerializable extends Context {
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
         INNER JOIN MATERIAL as c on a.id_material = c.id
         INNER JOIN USUARIO as d on a.id_usuario = d.id
-        where a.fecha_actualizacion = ? and a.id_estado IN (?)`
-        const sqlString = sqlCount + ';' * sqlSelect;
+        where a.fecha_actualizacion = ? and a.id_estado IN (?) LIMIT ${offset},${totalPage}`
+        const sqlString = sqlCount + sqlSelect;
         const values = [...this.mapGetItem(request), ...this.mapGetItem(request)]
         const responseQuery = await this.db.query(sqlString, values)
             .then(resp => {
@@ -46,7 +49,7 @@ export class StockSerializable extends Context {
                 console.log('Total', resp[0])
                 return {
                     code: resp[1].length === 0 ? 404 : 200,
-                    msg: resp
+                    msg: paginateResponse('stock/stock-serializable', page, resp[0].Total, totalPage, resp[1])
                 }
             })
             .catch(err => {
