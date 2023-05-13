@@ -5,12 +5,14 @@ export const response = ( code, msg) => {
     }
 }
 export const paginateResponse = (path, page, totalItems, totalPage, items) => {
-    const numberPages = Math.ceil(totalItems / totalPage);
+    console.log('totalItems', totalItems)
+    console.log('totalPage', totalPage)
+    const numberPages = Math.ceil(Number(totalItems) / Number(totalPage));
     const lastPageNumber = numberPages;
-    const nextPageCalc = page++;
-    const nextPageNumber = nextPageCalc > numberPages ? lastPage : nextPageCalc;
-    const previousPageCalc = page--;
-    const previousPageNumber = previousPageCalc < numberPages ? 1 : previousPageCalc;
+    const nextPageCalc = page+1;
+    const nextPageNumber = nextPageCalc > numberPages ? lastPageNumber : nextPageCalc;
+    const previousPageCalc = page-1;
+    const previousPageNumber = previousPageCalc < 1 ? 1 : previousPageCalc;
     const firstPage = `${path}?page=1`;
     const previousPage =`${path}?page=${previousPageNumber}`;
     const nextPage =`${path}?page=${nextPageNumber}`;
