@@ -1,7 +1,13 @@
+
+const accessControl = { 'Access-Control-Allow-Origin' : '*' };
+
 export const response = ( code, msg) => {
     return {
         statusCode: code,
         body: JSON.stringify(msg),
+        headers: {
+            ...accessControl
+        }
     }
 }
 export const paginateResponse = (path, page, totalItems, totalPage, items) => {

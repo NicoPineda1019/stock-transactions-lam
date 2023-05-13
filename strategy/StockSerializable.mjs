@@ -1,6 +1,7 @@
 import { Context } from "./Context.mjs";
 import { DataBase } from '../service/DataBase.mjs';
 import { paginateResponse, response } from "../utils/response.mjs";
+import { TOTAL_PAGE_PAGINATION } from "../constants.mjs";
 export class StockSerializable extends Context {
     constructor() {
         super()
@@ -29,12 +30,12 @@ export class StockSerializable extends Context {
     }
     async getItem(request, callback) {
         const page = request.page ? Number(request.page) : 1;
-        const totalPage = 5
+        const totalPage = TOTAL_PAGE_PAGINATION
         const offset = (page*totalPage - totalPage)
         const sqlCount = `SELECT COUNT(*) as Total
         FROM ${this.nameTable} as a 
         WHERE a.id_estado IN (?);`
-        const sqlSelect = `SELECT c.codigo, c.nombre as 'nombre_equipo', a.serial, a.fecha_cargue, a.fecha_actualizacion, 
+        const sqlSelect = `SELECT a.id, c.codigo, c.nombre as 'nombre', a.serial, a.fecha_cargue, a.fecha_actualizacion, 
         a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario' 
         FROM ${this.nameTable} as a 
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
