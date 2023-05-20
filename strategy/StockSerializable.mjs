@@ -10,7 +10,7 @@ export class StockSerializable extends Context {
     }
     async insertItems(request, callback) {
         const sqlString = `INSERT INTO ${this.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, serial, id_estado) VALUES ?`
-        const values = [this.mapInsertItem(request[0]), [1, '2023-05-20 10:00:00', '2023-05-20', '10:00:00', 'RGGSA234SADFAS',2]]
+        const values = this.mapInsertItem(request)
         const responseQuery = await this.db.query(sqlString, [values])
             .then(resp => {
                 console.log(`Response insertItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
