@@ -9,10 +9,9 @@ export class StockSerializable extends Context {
         this.nameTable = 'INVENTARIO_SERIALIZABLE'
     }
     async insertItems(request, callback) {
-        const sqlString = `INSERT INTO (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, 'serial', id_estado) 
-        ${this.nameTable} SET ?`
-        const values = this.mapInsertItem(request[0])
-        const responseQuery = await this.db.query(sqlString, values)
+        const sqlString = `INSERT INTO ${this.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, serial, id_estado) VALUES ?`
+        const values = [this.mapInsertItem(request[0]), [1, '2023-05-20 10:00:00', '2023-05-20', '10:00:00', 'RGGSA234SADFAS',2]]
+        const responseQuery = await this.db.query(sqlString, [values])
             .then(resp => {
                 console.log(`Response insertItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
                 return {
@@ -44,7 +43,7 @@ export class StockSerializable extends Context {
         INNER JOIN USUARIO as d on a.id_usuario = d.id
         WHERE a.id_estado IN (?) LIMIT ${offset},${totalPage}`
         const sqlString = sqlCount + sqlSelect;
-        const values = [...this.mapGetItem(request), ...this.mapGetItem(request)]
+        const values = this.mapGetItem(request)
         const responseQuery = await this.db.query(sqlString, values)
             .then(resp => {
                 console.log(`Response getItem in table => ${this.nameTable} : ${resp[1].length} elements`)
@@ -63,14 +62,7 @@ export class StockSerializable extends Context {
         callback(null, response(responseQuery.code, responseQuery.msg))
     }
     mapInsertItem(request) {
-        return [
-            request.idMaterial,
-            request.fechaCargue,
-            request.fechaActualizacion,
-            request.horaActualizacion,
-            request.serial,
-            request.idEstado
-        ]
+        return [[request.map((item) => [item])]]
     }
     mapGetItem(request) {
         const formatStates = request.idEstado.replaceAll(',','')
