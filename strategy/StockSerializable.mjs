@@ -62,7 +62,14 @@ export class StockSerializable extends Context {
         callback(null, response(responseQuery.code, responseQuery.msg))
     }
     mapInsertItem(request) {
-        return [request.map((item) => Object.values(item))]
+        return [request.map((item) => [
+            item.idMaterial,
+            item.fechaCargue,
+            item.fechaActualizacion,
+            item.horaActualizacion,
+            item.serial,
+            item.idEstado
+            ])]
     }
     mapGetItem(request) {
         const formatStates = request.idEstado.replaceAll(',','')
