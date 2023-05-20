@@ -40,8 +40,9 @@ export class StockSerializable extends Context {
         FROM ${this.nameTable} as a 
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
         INNER JOIN MATERIAL as c on a.id_material = c.id
-        INNER JOIN USUARIO as d on a.id_usuario = d.id
-        WHERE a.id_estado IN (?) LIMIT ${offset},${totalPage}`
+        LEFT JOIN USUARIO as d on a.id_usuario = d.id
+        WHERE a.id_estado IN (?) LIMIT ${offset},${totalPage}
+        ORDER BY a.fecha_cargue DESC`
         const sqlString = sqlCount + sqlSelect;
         const values = this.mapGetItem(request)
         const responseQuery = await this.db.query(sqlString, [values, values])
