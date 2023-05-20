@@ -1,5 +1,5 @@
 const methods = {
-    POST: 'insertItem',
+    POST: 'insertItems',
     PUT: 'updateItem',
     GET: 'getItem',
     DELETE: 'deleteItem'
@@ -11,8 +11,8 @@ export class Context {
     getMethod(httpMethod) {
         return methods[httpMethod]
     }
-    async insertItem(request, callback){
-        await this.strategy.insertItem(request, callback)
+    async insertItems(request, callback){
+        await this.strategy.insertItems(request, callback)
     }
     async getItem(request, callback){
         await this.strategy.getItem(request, callback)

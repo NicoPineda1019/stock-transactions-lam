@@ -8,9 +8,10 @@ export class StockSerializable extends Context {
         this.db = new DataBase()
         this.nameTable = 'INVENTARIO_SERIALIZABLE'
     }
-    async insertItem(request, callback) {
-        const sqlString = `INSERT INTO ${this.nameTable} SET ?`
-        const values = this.mapInsertItem(request)
+    async insertItems(request, callback) {
+        const sqlString = `INSERT INTO (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, 'serial', id_estado) 
+        ${this.nameTable} SET ?`
+        const values = this.mapInsertItem(request[0])
         const responseQuery = await this.db.query(sqlString, values)
             .then(resp => {
                 console.log(`Response insertItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
@@ -62,15 +63,14 @@ export class StockSerializable extends Context {
         callback(null, response(responseQuery.code, responseQuery.msg))
     }
     mapInsertItem(request) {
-        return {
-            id_material: request.idMaterial,
-            fecha_cargue: request.fechaCargue,
-            fecha_actualizacion: request.fechaActualizacion,
-            hora_actualizacion: request.horaActualizacion,
-            serial: request.serial,
-            id_usuario: request.idUsuario,
-            id_estado: request.idEstado
-        }
+        return [
+            request.idMaterial,
+            request.fechaCargue,
+            request.fechaActualizacion,
+            request.horaActualizacion,
+            request.serial,
+            request.idEstado
+        ]
     }
     mapGetItem(request) {
         const formatStates = request.idEstado.replaceAll(',','')
