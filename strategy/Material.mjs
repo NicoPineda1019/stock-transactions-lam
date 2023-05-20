@@ -1,5 +1,7 @@
 import { Context } from "./Context.mjs";
 import { DataBase } from '../service/DataBase.mjs';
+import { response } from "../utils/response.mjs";
+
 export class Material extends Context {
     constructor(){
         super()
@@ -13,7 +15,7 @@ export class Material extends Context {
             .catch(err => console.error(err))
        
     }
-    getItem(request, callback){
+    async getItem(request, callback){
         const sqlSelect = `SELECT A.id as idMaterial, A.codigo as codigo, A.nombre as nombre, B.nombre as categoria, C.nombre as unidad FROM
         ${this.nameTable} A
         INNER JOIN CATEGORIA_MATERIAL B ON A.id_categoria = B.id

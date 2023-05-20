@@ -44,7 +44,7 @@ export class StockSerializable extends Context {
         WHERE a.id_estado IN (?) LIMIT ${offset},${totalPage}`
         const sqlString = sqlCount + sqlSelect;
         const values = this.mapGetItem(request)
-        const responseQuery = await this.db.query(sqlString, values)
+        const responseQuery = await this.db.query(sqlString, [values, values])
             .then(resp => {
                 console.log(`Response getItem in table => ${this.nameTable} : ${resp[1].length} elements`)
                 return {
