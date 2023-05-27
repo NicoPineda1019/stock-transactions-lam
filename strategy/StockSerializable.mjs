@@ -15,7 +15,7 @@ export class StockSerializable extends Context {
             .then(resp => {
                 console.log(`Response insertItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
                 return {
-                    code: 200,
+                    code: 201,
                     msg: 'Item inserted with id => ' + resp?.insertId
                 }
             })
@@ -35,7 +35,7 @@ export class StockSerializable extends Context {
         .then(resp => {
             console.log(`Response updateItems in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
             return {
-                code: 201,
+                code: 200,
                 msg: 'Total Items updated => ' + resp?.changedRows
             }
         })
