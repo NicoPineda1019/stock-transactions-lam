@@ -32,16 +32,16 @@ export class StockSerializable extends Context {
         const values =  {
             fecha_actualizacion: request.fechaActualizacion,
             hora_actualizacion: request.horaActualizacion,
-            idEstado: request.idEstado,
-            idUsuario: request.idUsuario
+            id_estado: request.idEstado,
+            id_usuario: request.idUsuario
         }
-        const sqlString = `UPDATE ${this.nameTable} SET ? WHERE ID = ${request.id};`;
-        const responseQuery = await this.db.query(sqlString, values)
+        const sqlString = `UPDATE ${this.nameTable} SET ? WHERE ID IN (?);`;
+        const responseQuery = await this.db.query(sqlString, [values, this.mapGetItem(request)])
         .then(resp => {
             console.log(`Response updateItems in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
             return {
                 code: 200,
-                msg: 'Item updated with id => ' + resp?.rowAffecteds
+                msg: 'Total Items updated => ' + resp?.changedRows
             }
         })
         .catch(err => {

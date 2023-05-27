@@ -11,6 +11,9 @@ export class Context {
     getMethod(httpMethod) {
         return methods[httpMethod]
     }
+    async updateItems(request, callback){
+        await this.strategy.updateItems(request, callback)
+    }
     async insertItems(request, callback){
         await this.strategy.insertItems(request, callback)
     }
