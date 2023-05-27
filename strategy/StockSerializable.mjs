@@ -55,7 +55,7 @@ export class StockSerializable extends Context {
         const offset = (page*totalPage - totalPage)
         const sqlCount = `SELECT COUNT(*) as Total
         FROM ${this.nameTable} as a 
-        WHERE a.id_estado IN (?);`
+        WHERE a.id_estado IN ?;`
         const sqlSelect = `SELECT a.id, c.codigo, c.nombre as 'nombre', a.serial, a.fecha_cargue, a.fecha_actualizacion, 
         a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario' 
         FROM ${this.nameTable} as a 
