@@ -29,18 +29,13 @@ export class StockSerializable extends Context {
         callback(null, response(responseQuery.code, responseQuery.msg))
     }
     async updateItems(request, callback) {
-        const values =  {
-            fecha_actualizacion: request.fechaActualizacion,
-            hora_actualizacion: request.horaActualizacion,
-            id_estado: request.idEstado,
-            id_usuario: request.idUsuario
-        }
-        const sqlString = `UPDATE ${this.nameTable} SET ? WHERE ID IN (?);`;
-        const responseQuery = await this.db.query(sqlString, [values, this.mapGetItem(request)])
+        const values =  this.mapUpdateItems(request);
+        const sqlString = `UPDATE ${this.nameTable} SET ? WHERE ID IN ?;`;
+        const responseQuery = await this.db.query(sqlString, [values, this.mapMultipleId(request.id)])
         .then(resp => {
             console.log(`Response updateItems in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
             return {
-                code: 200,
+                code: 201,
                 msg: 'Total Items updated => ' + resp?.changedRows
             }
         })
@@ -98,6 +93,20 @@ export class StockSerializable extends Context {
             item.serial,
             item.idEstado
             ])]
+    }
+    mapUpdateItems(request) {
+        return {
+            fecha_actualizacion: request.fechaActualizacion,
+            hora_actualizacion: request.horaActualizacion,
+            id_estado: request.idEstado,
+            id_usuario: request.idUsuario
+        }
+    }
+    mapMultipleId(idArray) {
+        const formatStates = idArray.split(',')
+        return [
+            formatStates
+        ]
     }
     mapGetItem(request) {
         const formatStates = request.idEstado.replaceAll(',','')
