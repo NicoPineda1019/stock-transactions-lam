@@ -35,7 +35,7 @@ export class StockNoSerializable extends Context {
         const sqlCount = `SELECT COUNT(*) as Total
         FROM ${this.nameTable} as a 
         WHERE a.id_estado IN (?);`
-        const sqlSelect = `SELECT a.id, c.codigo, c.nombre as 'nombre', a.serial, a.fecha_cargue, a.fecha_actualizacion, 
+        const sqlSelect = `SELECT a.id, c.codigo, c.nombre as 'nombre', a.cantidad, a.fecha_cargue, a.fecha_actualizacion, 
         a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario' 
         FROM ${this.nameTable} as a 
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
@@ -51,7 +51,7 @@ export class StockNoSerializable extends Context {
                 console.log(`Response getItem in table => ${this.nameTable} : ${resp[1].length} elements`)
                 return {
                     code: resp[0][0].Total === 0 ? 404 : 200,
-                    msg: paginateResponse(`/stock/stock-serializable?idEstado${request.idEstado}`, page, resp[0][0].Total, totalPage, resp[1])
+                    msg: paginateResponse(`/stock/stock-no-serializable?idEstado${request.idEstado}`, page, resp[0][0].Total, totalPage, resp[1])
                 }
             })
             .catch(err => {
