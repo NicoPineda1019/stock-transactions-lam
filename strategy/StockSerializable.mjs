@@ -28,6 +28,32 @@ export class StockSerializable extends Context {
             })
         callback(null, response(responseQuery.code, responseQuery.msg))
     }
+    async updateItems(request, callback) {
+        const values =  {
+            fecha_actualizacion: request.fechaActualizacion,
+            hora_actualizacion: request.horaActualizacion,
+            idEstado: request.idEstado,
+            idUsuario: request.idUsuario
+        }
+        const sqlString = `UPDATE ${this.nameTable} SET ? WHERE ID = ${request.id};`;
+        const responseQuery = await this.db.query(sqlString, values)
+        .then(resp => {
+            console.log(`Response updateItems in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
+            return {
+                code: 200,
+                msg: 'Item updated with id => ' + resp?.rowAffecteds
+            }
+        })
+        .catch(err => {
+            console.error(err)
+            return {
+                code: 500,
+                msg: err.stack
+            }
+        })
+    callback(null, response(responseQuery.code, responseQuery.msg))
+
+    }
     async getItem(request, callback) {
         const page = request.page ? Number(request.page) : 1;
         const totalPage = TOTAL_PAGE_PAGINATION

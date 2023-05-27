@@ -1,6 +1,6 @@
 const methods = {
     POST: 'insertItems',
-    PUT: 'updateItem',
+    PUT: 'updateItems',
     GET: 'getItem',
     DELETE: 'deleteItem'
 }
