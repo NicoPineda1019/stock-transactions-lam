@@ -18,8 +18,8 @@ export class StockNoSerializable extends Context {
             console.log('SEARCHING INFO WITH ID_MATERIAL -> ' + infoMaterial.idMaterial)
             const responseQuery = await this.db.query(sqlQUery, [[infoMaterial.idMaterial],[idStock],[idNoUser]])
             .then(resp => {
-                console.log(`Response elements for id ${infoMaterial.idMaterial} in table => ${this.nameTable} : ${resp.length} elements`)
-                console.log(`FOUND ELEMENT WITH ID -> ${resp.id} AND QUANTITY -> ${resp.cantidad}`)
+                console.log(`RESPONSE FOR ID_MATERIAL -> ${infoMaterial.idMaterial} IN TABLE => ${this.nameTable} : ${resp.length} elements`)
+                console.log(`FOUND ELEMENT WITH ID -> ${resp[0].id} AND QUANTITY -> ${resp[0].cantidad}`)
                 return {
                     response: resp
                 }
