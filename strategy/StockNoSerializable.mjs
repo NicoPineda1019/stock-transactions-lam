@@ -31,7 +31,7 @@ export class StockNoSerializable extends Context {
                         // WAIT TIME WHILE ITEM IS UPDATING
                         setTimeout(() => {
                             resolve();
-                        }, tries);
+                        }, triesTimeOut);
                     })
                     continue
                 }
