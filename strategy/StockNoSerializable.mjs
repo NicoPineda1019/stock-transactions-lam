@@ -10,7 +10,7 @@ export class StockNoSerializable extends Context {
     this.nameTable = "INVENTARIO_NO_SERIALIZABLE";
   }
   async updateItems(request, callback) {
-    const dataGroup = groupById(request);
+    const dataGroup = groupById(request.elements);
     const idStock = request.idEstado;
     const idUser = request.idUsuario;
     for (const infoMaterial of dataGroup) {
