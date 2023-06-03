@@ -2,6 +2,7 @@ import { Context } from "./Context.mjs";
 import { DataBase } from '../service/DataBase.mjs';
 import { paginateResponse, response } from "../utils/response.mjs";
 import { TOTAL_PAGE_PAGINATION } from "../constants.mjs";
+import { groupById } from "../utils/utils.mjs";
 export class StockNoSerializable extends Context {
     constructor() {
         super()
@@ -9,6 +10,48 @@ export class StockNoSerializable extends Context {
         this.nameTable = 'INVENTARIO_NO_SERIALIZABLE'
     }
     async insertItems(request, callback) {
+        const dataGroup = groupById(request);
+        for (const infoMaterial of dataGroup) {
+            const sqlQUery = `SELECT id, cantidad FROM ${this.nameTable} WHERE id_material = ? AND id_estado = ? AND id_usuario = ? LIMIT 1;`
+            const responseQuery = await this.db.query(sqlString, [[infoMaterial.id, 1, 0]])
+            .then(resp => {
+                console.log(`Response getItem in table => ${this.nameTable} : ${resp[0].length} elements`)
+                return {
+                    response: resp[0]
+                }
+            })
+            .catch(err => {
+                console.error(err)
+                return {
+                    error: err.stack
+                }
+            })
+            if (responseQuery?.error) {
+                return callback(null, response(500, responseQuery.error))
+            }
+        }
+        /*
+        if (responseQuery.response.length === 1) {
+            const responseValues = responseQuery.response[0]
+            const newCuantity = responseValues.cantidad + request[0].cantidad
+            const sqlUpdate = `UPDATE ${this.nameTable} SET ? WHERE ID = ?;`
+            const responseQuery = await this.db.query(sqlUpdate, [values, this.mapMultipleId(request.id)])
+            .then(resp => {
+                console.log(`Response updateItems in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
+                return {
+                    code: 200,
+                    msg: 'Total Items updated => ' + resp?.changedRows
+                }
+            })
+            .catch(err => {
+                console.error(err)
+                return {
+                    code: 500,
+                    msg: err.stack
+                }
+            })
+    
+        }
         const sqlString = `INSERT INTO ${this.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, cantidad, id_estado) VALUES ?`
         const values = this.mapInsertItem(request)
         const responseQuery = await this.db.query(sqlString, values)
@@ -27,6 +70,7 @@ export class StockNoSerializable extends Context {
                 }
             })
         callback(null, response(responseQuery.code, responseQuery.msg))
+        */
     }
     async getItem(request, callback) {
         const page = request.page ? Number(request.page) : 1;
