@@ -13,124 +13,53 @@ export class StockNoSerializable extends Context {
     const dataGroup = groupById(request.elements);
     const idStock = request.idEstado;
     const idUser = request.idUsuario;
+    const errors = [];
     for (const infoMaterial of dataGroup) {
-        // ALGORITHM AVOID UPDATE SIMULTANEOSTLY
-        for (const triesTimeOut of [50,100]) {
-            let mustRetry = false;
-            const responseQuery = await this.getItemByConditions(infoMaterial, idStock, idUser);
-            if (responseQuery?.error) {
-                return callback(null, response(500, responseQuery.error))
-            }
-            if (responseQuery.response.length === 1) {
-                const responseUpdate = await this.updateItem(infoMaterial, responseQuery.response[0], request);
-                if (responseUpdate?.error ) return callback(null, response(500, responseQuery.error))
-                // IF DIDN'T UPDATE ROWS, MUST RETRY
-                mustRetry = responseUpdate?.rows === 0
-                if (mustRetry) {
-                    await new Promise((resolve) => {
-                        // WAIT TIME WHILE ITEM IS UPDATING
-                        setTimeout(() => {
-                            resolve();
-                        }, triesTimeOut);
-                    })
-                    continue
-                }
-                // UPDATED WAS SUCCESSFULLY AND MUS NOT RETRY
-                else break
-            } else {
-                await this.inserItem(request, infoMaterial);
-                break
-            }
-            
-
+      // ALGORITHM AVOID UPDATE SIMULTANEOSTLY
+      for (const triesTimeOut of [50, 100]) {
+        let mustRetry = false;
+        const responseQuery = await this.getItemByConditions(
+          infoMaterial,
+          idStock,
+          idUser
+        );
+        if (responseQuery?.error) {
+          errors.push(responseQuery.error);
+          break;
         }
-        
+        if (responseQuery.response.length === 1) {
+          const responseUpdate = await this.updateItem(
+            infoMaterial,
+            responseQuery.response[0],
+            request
+          );
+          if (responseUpdate?.error) {
+            errors.push(responseQuery.error);
+            break;
+          }
+          // IF DIDN'T UPDATE ROWS, MUST RETRY
+          mustRetry = responseUpdate?.rows === 0;
+          if (mustRetry) {
+            await new Promise((resolve) => {
+              // WAIT TIME WHILE ITEM IS UPDATING
+              setTimeout(() => {
+                resolve();
+              }, triesTimeOut);
+            });
+            continue;
+          }
+          // UPDATED WAS SUCCESSFULLY AND MUS NOT RETRY
+          else break;
+        } else {
+          await this.inserItem(request, infoMaterial);
+          break;
+        }
+      }
     }
-    callback(null, response(200, 'OK'))
-    /*
-        for (const infoMaterial of dataGroup) {
-            for (const tries of [50,50] ) {
-                let mustRetry = false;
-                const sqlQUery = `SELECT id, cantidad, id_material FROM ${this.nameTable} WHERE id_material = ? AND id_estado = ? AND id_usuario = ? LIMIT 1;`
-                console.log('SEARCHING INFO WITH ID_MATERIAL -> ' + infoMaterial.idMaterial)
-                const responseQuery = await this.db.query(sqlQUery, [[infoMaterial.idMaterial],[idStock],[idNoUser]])
-                .then(resp => {
-                    console.log(`RESPONSE FOR ID_MATERIAL -> ${infoMaterial.idMaterial} IN TABLE => ${this.nameTable} : ${resp.length} elements`)
-                    console.log(`FOUND ELEMENT WITH ID -> ${resp[0].id} AND QUANTITY -> ${resp[0].cantidad}`)
-                    return {
-                        response: resp
-                    }
-                })
-                .catch(err => {
-                    console.error(`FAILED FOR ${infoMaterial.idMaterial}`)
-                    console.error(err)
-                    return {
-                        error: err.stack
-                    }
-                })
-                if (responseQuery?.error) {
-                    return callback(null, response(500, responseQuery.error))
-                }
-                console.log('response', responseQuery.response)
-                if (responseQuery.response.length === 1) {
-                    const responseValues = responseQuery.response[0]
-                    const newCuantity = responseValues.cantidad + request[0].cantidad
-                    const sqlUpdate = `UPDATE ${this.nameTable} SET ? WHERE ID = ? AND cantidad = ?;`
-                    const values = {
-                        cantidad: newCuantity
-                    }
-                    const responseUpdate= await this.db.query(sqlUpdate, [values, [responseValues.id], responseValues.cantidad])
-                    .then(resp => {
-                        console.log(`Response updateItems in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
-                        mustRetry = resp?.changedRows === 0
-                        return {
-                            code: 200,
-                            msg: 'Total Items updated => ' + resp?.changedRows
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err)
-                        return {
-                            code: 500,
-                            msg: err.stack
-                        }
-                    })
-                    if (mustRetry) {
-                        await new Promise((resolve) => {
-                            setTimeout(() => {
-                                resolve();
-                            }, tries);
-                        })
-                        continue
-                    }
-                    else break
-                }
-            }
-  
-        }
-        */
-    /*
-        const sqlString = `INSERT INTO ${this.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, cantidad, id_estado) VALUES ?`
-        const values = this.mapInsertItem(request)
-        const responseQuery = await this.db.query(sqlString, values)
-            .then(resp => {
-                console.log(`Response insertItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
-                return {
-                    code: 201,
-                    msg: 'Item inserted with id => ' + resp?.insertId
-                }
-            })
-            .catch(err => {
-                console.error(err)
-                return {
-                    code: 500,
-                    msg: err.stack
-                }
-            })
-            */
+    if (errors.length > 0) return callback(null, response(500, { errors }));
     callback(null, response(200, "Ok"));
   }
-  
+
   async getItemByConditions(infoMaterial, idStock, idUser) {
     const sqlQUery = `SELECT id, cantidad, id_material FROM ${this.nameTable} WHERE id_material = ? AND id_estado = ? AND id_usuario = ? LIMIT 1;`;
     console.log(
@@ -143,7 +72,7 @@ export class StockNoSerializable extends Context {
           `RESPONSE FOR ID_MATERIAL -> ${infoMaterial.idMaterial} IN TABLE => ${this.nameTable} : ${resp.length} elements`
         );
         console.log(
-          `FOUND ELEMENT WITH ID -> ${resp[0].id} AND QUANTITY -> ${resp[0].cantidad}`
+          `FOUND ELEMENT WITH ID -> ${resp[0]?.id} AND QUANTITY -> ${resp[0]?.cantidad}`
         );
         return {
           response: resp,
@@ -159,48 +88,65 @@ export class StockNoSerializable extends Context {
     return responseQuery;
   }
   async updateItem(infoMaterial, infoQuery, request) {
-    const newCuantity = infoQuery.cantidad + infoMaterial.cantidad
-    const sqlUpdate = `UPDATE ${this.nameTable} SET ? WHERE ID = ? AND cantidad = ?;`
-    const values = {
-        cantidad: newCuantity,
-        fecha_actualizacion: request.fechaActualizacion,
-        hora_actualizacion: request.horaActualizacion,
+    const newCuantity = infoQuery.cantidad + infoMaterial.cantidad;
+    if ( newCuantity <= 0) {
+        console.log('RESULT NEW CUANTITY IS ->', +newCuantity)
+        console.error('WILL NOT UPDATE BECAUSE IS INVALID VALUE')
+        return {
+            error: 'id material-> ' +  infoMaterial.idMaterial + ' has invalid value'
+        }
     }
-    const responseUpdate = await this.db.query(sqlUpdate,[values, [infoMaterial.id], infoQuery.cantidad])
-    .then(resp => {
-        console.log(`RESPONSE updateItem FOR ID_MATERIAL -> ${infoMaterial.idMaterial} in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
-        mustRetry = resp?.changedRows === 0
+    const sqlUpdate = `UPDATE ${this.nameTable} SET ? WHERE ID = ? AND cantidad = ?;`;
+    const values = {
+      cantidad: newCuantity,
+      fecha_actualizacion: request.fechaActualizacion,
+      hora_actualizacion: request.horaActualizacion,
+    };
+    const responseUpdate = await this.db
+      .query(sqlUpdate, [values, [infoQuery.id], infoQuery.cantidad])
+      .then((resp) => {
+        console.log(
+          `RESPONSE updateItem FOR ID_MATERIAL -> ${
+            infoMaterial.idMaterial
+          } in table => ${this.nameTable} : ${JSON.stringify(resp)}`
+        );
         return {
-            rows: resp?.changedRows
-        }
-    })
-    .catch(err => {
+          rows: resp?.changedRows,
+        };
+      })
+      .catch((err) => {
         console.error(`FAILED FOR ${infoMaterial.idMaterial}`);
-        console.error(err)
+        console.error(err);
         return {
-            error: err.stack
-        }
-    })
-    return responseUpdate
+          error: err.stack,
+        };
+      });
+    return responseUpdate;
   }
   async inserItem(request, infoMaterial) {
-    const sqlString = `INSERT INTO ${this.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, cantidad, id_estado) VALUES ?`
-    const values = this.mapInsertItem(request, infoMaterial)
-    await this.db.query(sqlString, values)
-        .then(resp => {
-            console.log(`Response insertItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
-            return {
-                code: 201,
-                msg: 'Item inserted with id => ' + resp?.insertId
-            }
-        })
-        .catch(err => {
-            console.error(err)
-            return {
-                code: 500,
-                msg: err.stack
-            }
-        })
+    const sqlString = `INSERT INTO ${this.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, cantidad, id_estado, id_usuario) VALUES ?`;
+    const values = this.mapInsertItem(request, infoMaterial);
+    console.log("values", values);
+    await this.db
+      .query(sqlString, [[values]])
+      .then((resp) => {
+        console.log(
+          `Response insertItem in table => ${this.nameTable} : ${JSON.stringify(
+            resp
+          )}`
+        );
+        return {
+          code: 201,
+          msg: "Item inserted with id => " + resp?.insertId,
+        };
+      })
+      .catch((err) => {
+        console.error(err);
+        return {
+          code: 500,
+          msg: err.stack,
+        };
+      });
   }
   async getItem(request, callback) {
     const page = request.page ? Number(request.page) : 1;
@@ -248,12 +194,13 @@ export class StockNoSerializable extends Context {
   }
   mapInsertItem(request, extraData) {
     return [
-        extraData.idMaterial,
-        (`${request.fechaActualizacion} ${request.horaActualizacion}`),
-        request.fechaActualizacion,
-        request.horaActualizacion,
-        Number(extraData.cantidad),
-        request.idEstado,
+      extraData.idMaterial,
+      `${request.fechaActualizacion} ${request.horaActualizacion}`,
+      request.fechaActualizacion,
+      request.horaActualizacion,
+      Number(extraData.cantidad),
+      request.idEstado,
+      request.idUsuario,
     ];
   }
   mapGetItem(request) {
