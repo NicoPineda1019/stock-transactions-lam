@@ -13,7 +13,7 @@ export class StockNoSerializable extends Context {
     const dataGroup = groupById(request.elements);
     const idStock = request.idEstado;
     const idUser = request.idUsuario;
-    const errors = [];
+    const errorsList = [];
     for (const infoMaterial of dataGroup) {
       // ALGORITHM AVOID UPDATE SIMULTANEOSTLY
       for (const triesTimeOut of [50, 100]) {
@@ -24,7 +24,7 @@ export class StockNoSerializable extends Context {
           idUser
         );
         if (responseQuery?.error) {
-          errors.push(responseQuery.error);
+          errorsList.push(responseQuery.error);
           break;
         }
         if (responseQuery.response.length === 1) {
@@ -34,7 +34,7 @@ export class StockNoSerializable extends Context {
             request
           );
           if (responseUpdate?.error) {
-            errors.push(responseQuery.error);
+            errorsList.push(responseUpdate.error);
             break;
           }
           // IF DIDN'T UPDATE ROWS, MUST RETRY
@@ -56,7 +56,8 @@ export class StockNoSerializable extends Context {
         }
       }
     }
-    if (errors.length > 0) return callback(null, response(500, { errors }));
+    if (errorsList.length > 0)
+      return callback(null, response(500, { errors: errorsList }));
     callback(null, response(200, "Ok"));
   }
 
@@ -89,12 +90,15 @@ export class StockNoSerializable extends Context {
   }
   async updateItem(infoMaterial, infoQuery, request) {
     const newCuantity = infoQuery.cantidad + infoMaterial.cantidad;
-    if ( newCuantity <= 0) {
-        console.log('RESULT NEW CUANTITY IS ->', +newCuantity)
-        console.error('WILL NOT UPDATE BECAUSE IS INVALID VALUE')
-        return {
-            error: 'id material-> ' +  infoMaterial.idMaterial + ' has invalid value'
-        }
+    if (newCuantity < 0) {
+      console.log("RESULT NEW CUANTITY IS ->", +newCuantity);
+      console.error("WILL NOT UPDATE BECAUSE IS INVALID VALUE");
+      return {
+        error: {
+          [infoMaterial.idMaterial]:
+            "id material-> " + infoMaterial.idMaterial + " has invalid value",
+        },
+      };
     }
     const sqlUpdate = `UPDATE ${this.nameTable} SET ? WHERE ID = ? AND cantidad = ?;`;
     const values = {
