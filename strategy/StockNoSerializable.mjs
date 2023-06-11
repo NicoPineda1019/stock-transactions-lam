@@ -4,10 +4,10 @@ import { paginateResponse, response } from "../utils/response.mjs";
 import { TOTAL_PAGE_PAGINATION } from "../constants.mjs";
 import { groupById } from "../utils/utils.mjs";
 export class StockNoSerializable extends Context {
+  static nameTable = 'INVENTARIO_NO_SERIALIZABLE'
   constructor() {
     super();
     this.db = new DataBase();
-    this.nameTable = "INVENTARIO_NO_SERIALIZABLE";
   }
   async updateItems(request, callback) {
     const dataGroup = groupById(request.elements);

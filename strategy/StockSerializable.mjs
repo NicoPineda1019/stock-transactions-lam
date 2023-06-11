@@ -3,10 +3,10 @@ import { DataBase } from '../service/DataBase.mjs';
 import { paginateResponse, response } from "../utils/response.mjs";
 import { TOTAL_PAGE_PAGINATION } from "../constants.mjs";
 export class StockSerializable extends Context {
+    static nameTable = 'INVENTARIO_SERIALIZABLE'
     constructor() {
         super()
         this.db = new DataBase()
-        this.nameTable = 'INVENTARIO_SERIALIZABLE'
     }
     async insertItems(request, callback) {
         const sqlString = `INSERT INTO ${this.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, serial, id_estado) VALUES ?`
