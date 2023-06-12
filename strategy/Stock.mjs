@@ -2,6 +2,7 @@ import { StockNoSerializable } from "./StockNoSerializable.mjs";
 import { StockSerializable } from "./StockSerializable.mjs";
 import { Context } from "./Context.mjs";
 import { DataBase } from "../service/DataBase.mjs";
+import { response } from "../utils/response.mjs";
 
 export class Stock extends Context {
         constructor() {
@@ -26,7 +27,12 @@ export class Stock extends Context {
         // const values = this.mapGetItem(request)
         const responseQuery = await this.db.query(sqlString)
             .then(resp => {
-                console.log(`Response getItem in table => ${JSON.stringify(resp)}`)
+                const concatResponse = [...resp[0], ...resp[1]]
+                console.log(`Response getItem with => ${concatResponse.length} elements`)
+                return {
+                    code: 200,
+                    msg: concatResponse
+                }
             })
             .catch(err => {
                 console.error(err)
@@ -35,6 +41,6 @@ export class Stock extends Context {
                     msg: err.stack
                 }
             })
-        // callback(null, response(responseQuery.code, responseQuery.msg))
+        callback(null, response(responseQuery.code, responseQuery.msg))
     }
 }
