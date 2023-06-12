@@ -1,7 +1,13 @@
 import { StockNoSerializable } from "./StockNoSerializable.mjs";
 import { StockSerializable } from "./StockSerializable.mjs";
+import { Context } from "./Context.mjs";
+import { DataBase } from "../service/DataBase.mjs";
 
 export class Stock extends Context {
+        constructor() {
+        super()
+        this.db = new DataBase()
+    }
 
     async getItem(request, callback){
         const sqlSerializable = `SELECT COUNT(*) as total, c.codigo, c.nombre as 'nombre',  b.nombre as 'estado'
@@ -10,7 +16,7 @@ export class Stock extends Context {
         INNER JOIN MATERIAL as c on a.id_material = c.id
         LEFT JOIN USUARIO as d on a.id_usuario = d.id
         group by a.id_material, a.id_estado;`
-        const sqlNoSerializable = `SELECT COUNT(*) as total, c.codigo, c.nombre as 'nombre',  b.nombre as 'estado'
+        const sqlNoSerializable = `SELECT SUM(cantidad) as total, c.codigo, c.nombre as 'nombre',  b.nombre as 'estado'
         FROM ${StockNoSerializable.nameTable} as a 
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
         INNER JOIN MATERIAL as c on a.id_material = c.id
@@ -29,6 +35,6 @@ export class Stock extends Context {
                     msg: err.stack
                 }
             })
-        callback(null, response(responseQuery.code, responseQuery.msg))
+        // callback(null, response(responseQuery.code, responseQuery.msg))
     }
 }
