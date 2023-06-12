@@ -62,7 +62,7 @@ export class StockNoSerializable extends Context {
   }
 
   async getItemByConditions(infoMaterial, idStock, idUser) {
-    const sqlQUery = `SELECT id, cantidad, id_material FROM ${this.nameTable} WHERE id_material = ? AND id_estado = ? AND id_usuario = ? LIMIT 1;`;
+    const sqlQUery = `SELECT id, cantidad, id_material FROM ${StockNoSerializable.nameTable} WHERE id_material = ? AND id_estado = ? AND id_usuario = ? LIMIT 1;`;
     console.log(
       "SEARCHING INFO WITH ID_MATERIAL -> " + infoMaterial.idMaterial
     );
@@ -70,7 +70,7 @@ export class StockNoSerializable extends Context {
       .query(sqlQUery, [[infoMaterial.idMaterial], [idStock], [idUser]])
       .then((resp) => {
         console.log(
-          `RESPONSE FOR ID_MATERIAL -> ${infoMaterial.idMaterial} IN TABLE => ${this.nameTable} : ${resp.length} elements`
+          `RESPONSE FOR ID_MATERIAL -> ${infoMaterial.idMaterial} IN TABLE => ${StockNoSerializable.nameTable} : ${resp.length} elements`
         );
         console.log(
           `FOUND ELEMENT WITH ID -> ${resp[0]?.id} AND QUANTITY -> ${resp[0]?.cantidad}`
@@ -100,7 +100,7 @@ export class StockNoSerializable extends Context {
         },
       };
     }
-    const sqlUpdate = `UPDATE ${this.nameTable} SET ? WHERE ID = ? AND cantidad = ?;`;
+    const sqlUpdate = `UPDATE ${StockNoSerializable.nameTable} SET ? WHERE ID = ? AND cantidad = ?;`;
     const values = {
       cantidad: newCuantity,
       fecha_actualizacion: request.fechaActualizacion,
@@ -112,7 +112,7 @@ export class StockNoSerializable extends Context {
         console.log(
           `RESPONSE updateItem FOR ID_MATERIAL -> ${
             infoMaterial.idMaterial
-          } in table => ${this.nameTable} : ${JSON.stringify(resp)}`
+          } in table => ${StockNoSerializable.nameTable} : ${JSON.stringify(resp)}`
         );
         return {
           rows: resp?.changedRows,
@@ -128,14 +128,14 @@ export class StockNoSerializable extends Context {
     return responseUpdate;
   }
   async inserItem(request, infoMaterial) {
-    const sqlString = `INSERT INTO ${this.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, cantidad, id_estado, id_usuario) VALUES ?`;
+    const sqlString = `INSERT INTO ${StockNoSerializable.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, cantidad, id_estado, id_usuario) VALUES ?`;
     const values = this.mapInsertItem(request, infoMaterial);
     console.log("values", values);
     await this.db
       .query(sqlString, [[values]])
       .then((resp) => {
         console.log(
-          `Response insertItem in table => ${this.nameTable} : ${JSON.stringify(
+          `Response insertItem in table => ${StockNoSerializable.nameTable} : ${JSON.stringify(
             resp
           )}`
         );
@@ -157,11 +157,11 @@ export class StockNoSerializable extends Context {
     const totalPage = TOTAL_PAGE_PAGINATION;
     const offset = page * totalPage - totalPage;
     const sqlCount = `SELECT COUNT(*) as Total
-        FROM ${this.nameTable} as a 
+        FROM ${StockNoSerializable.nameTable} as a 
         WHERE a.id_estado IN ?;`;
     const sqlSelect = `SELECT a.id, c.codigo, c.nombre as 'nombre', a.cantidad, a.fecha_cargue, a.fecha_actualizacion, 
         a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario' 
-        FROM ${this.nameTable} as a 
+        FROM ${StockNoSerializable.nameTable} as a 
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
         INNER JOIN MATERIAL as c on a.id_material = c.id
         LEFT JOIN USUARIO as d on a.id_usuario = d.id
@@ -174,7 +174,7 @@ export class StockNoSerializable extends Context {
       .query(sqlString, [values, values])
       .then((resp) => {
         console.log(
-          `Response getItem in table => ${this.nameTable} : ${resp[1].length} elements`
+          `Response getItem in table => ${StockNoSerializable.nameTable} : ${resp[1].length} elements`
         );
         return {
           code: resp[0][0].Total === 0 ? 404 : 200,

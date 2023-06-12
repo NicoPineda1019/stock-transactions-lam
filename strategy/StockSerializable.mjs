@@ -9,11 +9,11 @@ export class StockSerializable extends Context {
         this.db = new DataBase()
     }
     async insertItems(request, callback) {
-        const sqlString = `INSERT INTO ${this.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, serial, id_estado) VALUES ?`
+        const sqlString = `INSERT INTO ${StockSerializable.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, serial, id_estado) VALUES ?`
         const values = this.mapInsertItem(request)
         const responseQuery = await this.db.query(sqlString, values)
             .then(resp => {
-                console.log(`Response insertItem in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
+                console.log(`Response insertItem in table => ${StockSerializable.nameTable} : ${JSON.stringify(resp)}`)
                 return {
                     code: 201,
                     msg: 'Item inserted with id => ' + resp?.insertId
@@ -30,10 +30,10 @@ export class StockSerializable extends Context {
     }
     async updateItems(request, callback) {
         const values =  this.mapUpdateItems(request);
-        const sqlString = `UPDATE ${this.nameTable} SET ? WHERE ID IN ?;`;
+        const sqlString = `UPDATE ${StockSerializable.nameTable} SET ? WHERE ID IN ?;`;
         const responseQuery = await this.db.query(sqlString, [values, this.mapMultipleId(request.id)])
         .then(resp => {
-            console.log(`Response updateItems in table => ${this.nameTable} : ${JSON.stringify(resp)}`)
+            console.log(`Response updateItems in table => ${StockSerializable.nameTable} : ${JSON.stringify(resp)}`)
             return {
                 code: 200,
                 msg: 'Total Items updated => ' + resp?.changedRows
@@ -54,11 +54,11 @@ export class StockSerializable extends Context {
         const totalPage = TOTAL_PAGE_PAGINATION
         const offset = (page*totalPage - totalPage)
         const sqlCount = `SELECT COUNT(*) as Total
-        FROM ${this.nameTable} as a 
+        FROM ${StockSerializable.nameTable} as a 
         WHERE a.id_estado IN ?;`
         const sqlSelect = `SELECT a.id, c.codigo, c.nombre as 'nombre', a.serial, a.fecha_cargue, a.fecha_actualizacion, 
         a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario' 
-        FROM ${this.nameTable} as a 
+        FROM ${StockSerializable.nameTable} as a 
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
         INNER JOIN MATERIAL as c on a.id_material = c.id
         LEFT JOIN USUARIO as d on a.id_usuario = d.id
@@ -69,7 +69,7 @@ export class StockSerializable extends Context {
         const values = this.mapGetItem(request)
         const responseQuery = await this.db.query(sqlString, [values, values])
             .then(resp => {
-                console.log(`Response getItem in table => ${this.nameTable} : ${resp[1].length} elements`)
+                console.log(`Response getItem in table => ${StockSerializable.nameTable} : ${resp[1].length} elements`)
                 return {
                     code: resp[0][0].Total === 0 ? 404 : 200,
                     msg: paginateResponse(`/stock/stock-serializable?idEstado${request.idEstado}`, page, resp[0][0].Total, totalPage, resp[1])
