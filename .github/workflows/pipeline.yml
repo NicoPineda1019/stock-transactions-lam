@@ -46,6 +46,7 @@ jobs:
           --timeout 90 \
           --runtime nodejs${{ matrix.node-version }} \
           --layers arn:aws:lambda:us-east-1:227205496403:layer:mysql-layer:2 \
+          arn:aws:lambda:us-east-1:227205496403:layer:xlsx:1 \
       - name: lambda status
         run: |
           NAME="stock-transactions-lam-dev"

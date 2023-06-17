@@ -1,3 +1,5 @@
+import xlsx from 'xlsx';
+
 export const groupById = (data) => {
   const temp = {};
   const dataGroupBy = data.reduce(function (acumulator, current) {
@@ -27,4 +29,20 @@ export const groupStockByCode = (data) => {
     }
   })
   return Object.values(temp)
+}
+
+export const transformBase64ToJson = (base64) => {
+  const result = {};
+  try {
+    const workbook = xlsx.read(base64, {type: "base64"});
+    workbook.SheetNames.forEach(function(sheetName) {
+      const roa = xlsx.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+      if (roa.length > 0) {
+        result[sheetName] = roa;
+      }
+    })
+  } catch (error) {
+    console.error(error)
+  }
+  return result
 }
