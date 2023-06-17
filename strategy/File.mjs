@@ -37,7 +37,7 @@ export class File extends Context {
             confirmacion_cargue: 'SI'
         }
         const idsToUpdate = compareStockElements(seriales, serialesFound)
-        const responseUpdate = await this.db.query(sqlUpdate, [values, idsToUpdate ])
+        const responseUpdate = await this.db.query(sqlUpdate, [values, [[idsToUpdate]] ])
         .then(resp => {
             console.log(`Response updateItems in table => ${StockSerializable.nameTable} : ${JSON.stringify(resp)}`)
             return {
