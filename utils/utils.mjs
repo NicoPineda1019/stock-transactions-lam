@@ -46,3 +46,15 @@ export const transformBase64ToJson = (base64) => {
   }
   return result
 }
+
+export const compareStockElements = (serialesFile, serilesFound ) => {
+  const itemsToConfirm = []
+  serilesFound.forEach((item) => {
+    const idFound = serialesFile.findIndex((serial) => item.serial === serial)
+    if (idFound >= 0) {
+      itemsToConfirm.push(item.id)
+      serialesFile.splice(idFound,1)
+    }
+  })
+  return itemsToConfirm
+}
