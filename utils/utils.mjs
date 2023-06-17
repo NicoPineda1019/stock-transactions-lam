@@ -21,6 +21,7 @@ export const groupStockByCode = (data) => {
     temp[item.codigo] = {
       ...temp[item.codigo],
       codigo: item.codigo,
+      unidad: item.unidad_material,
       nombre: item.nombre,
       [item.estado] : item.total
     }
