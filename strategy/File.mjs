@@ -11,7 +11,7 @@ export class File extends Context {
     }
     async updateItems(request, callback) {
         const excelFile = transformBase64ToJson(request.file)
-        if (Object.keys(excelFile) === 0) {
+        if (Object.keys(excelFile).length === 0) {
             return callback(null, response(500, 'Error getting File'))
         }
         const seriales = excelFile['Hoja1'].map((item) => item.Serial)
