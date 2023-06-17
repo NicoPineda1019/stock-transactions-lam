@@ -18,7 +18,7 @@ export class Stock extends Context {
         INNER JOIN MATERIAL as c on a.id_material = c.id
         LEFT JOIN USUARIO as d on a.id_usuario = d.id
         INNER JOIN UNIDAD_MATERIAL as e on c.id_unidad = e.id
-        WHERE a.fecha_actualizacion between ${request.startDate} and ${request.endDate}
+        WHERE a.fecha_actualizacion between '${request.startDate}' and '${request.endDate}'
         group by a.id_material, a.id_estado;`
         const sqlNoSerializable = `SELECT SUM(cantidad) as total, c.codigo, c.nombre as 'nombre', e.nombre as 'unidad_material', b.nombre as 'estado'
         FROM ${StockNoSerializable.nameTable} as a 
@@ -26,7 +26,7 @@ export class Stock extends Context {
         INNER JOIN MATERIAL as c on a.id_material = c.id
         LEFT JOIN USUARIO as d on a.id_usuario = d.id
         INNER JOIN UNIDAD_MATERIAL as e on c.id_unidad = e.id
-        WHERE a.fecha_actualizacion between ${request.startDate} and ${request.endDate}
+        WHERE a.fecha_actualizacion between '${request.startDate}' and '${request.endDate}'
         group by a.id_material, a.id_estado;`
         const sqlString = sqlSerializable + sqlNoSerializable;
         const responseQuery = await this.db.query(sqlString)
