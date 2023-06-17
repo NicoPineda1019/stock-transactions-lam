@@ -14,3 +14,16 @@ export const groupById = (data) => {
   }, []);
   return dataGroupBy;
 };
+
+export const groupStockByCode = (data) => {
+  const temp = {}
+  data.forEach((item) => {
+    temp[item.codigo] = {
+      ...temp[item.codigo],
+      codigo: item.codigo,
+      nombre: item.nombre,
+      [item.estado] : item.total
+    }
+  })
+  return Object.values(temp)
+}

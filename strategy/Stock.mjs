@@ -3,6 +3,7 @@ import { StockSerializable } from "./StockSerializable.mjs";
 import { Context } from "./Context.mjs";
 import { DataBase } from "../service/DataBase.mjs";
 import { response } from "../utils/response.mjs";
+import { groupStockByCode } from "../utils/utils.mjs";
 
 export class Stock extends Context {
         constructor() {
@@ -31,7 +32,7 @@ export class Stock extends Context {
                 console.log(`Response getItem with => ${concatResponse.length} elements`)
                 return {
                     code: 200,
-                    msg: concatResponse
+                    msg: groupStockByCode(concatResponse)
                 }
             })
             .catch(err => {
