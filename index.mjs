@@ -4,6 +4,7 @@ import { Context } from './strategy/Context.mjs';
 const dB = new DataBase()
 
 export const handler = async (event, context, callback) => {
+    console.log('event => ',event)
     context.callbackWaitsForEmptyEventLoop = false; // Permite que se ejecute el callback con conexión abierta de mysql
     console.log('Path => ', event.path)
     console.log('HTTP Method => ', event.httpMethod)

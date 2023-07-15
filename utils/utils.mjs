@@ -1,3 +1,5 @@
+import xlsx from 'xlsx';
+
 export const groupById = (data) => {
   const temp = {};
   const dataGroupBy = data.reduce(function (acumulator, current) {
@@ -21,9 +23,38 @@ export const groupStockByCode = (data) => {
     temp[item.codigo] = {
       ...temp[item.codigo],
       codigo: item.codigo,
+      unidad: item.unidad_material,
       nombre: item.nombre,
       [item.estado] : item.total
     }
   })
   return Object.values(temp)
+}
+
+export const transformBase64ToJson = (base64) => {
+  const result = {};
+  try {
+    const workbook = xlsx.read(base64, {type: "base64"});
+    workbook.SheetNames.forEach(function(sheetName) {
+      const roa = xlsx.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+      if (roa.length > 0) {
+        result[sheetName] = roa;
+      }
+    })
+  } catch (error) {
+    console.error(error)
+  }
+  return result
+}
+
+export const compareStockElements = (serialesFile, serilesFound ) => {
+  const itemsToConfirm = []
+  serilesFound.forEach((item) => {
+    const idFound = serialesFile.findIndex((serial) => item.serial === serial)
+    if (idFound >= 0) {
+      itemsToConfirm.push(item.id)
+      serialesFile.splice(idFound,1)
+    }
+  })
+  return itemsToConfirm
 }
