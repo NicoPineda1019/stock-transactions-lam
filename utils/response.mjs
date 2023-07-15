@@ -11,8 +11,6 @@ export const response = ( code, msg) => {
     }
 }
 export const paginateResponse = (path, page, totalItems, totalPage, items) => {
-    console.log('totalItems', totalItems)
-    console.log('totalPage', totalPage)
     const numberPages = Math.ceil(Number(totalItems) / Number(totalPage));
     const lastPageNumber = numberPages;
     const nextPageCalc = page+1;
@@ -25,6 +23,7 @@ export const paginateResponse = (path, page, totalItems, totalPage, items) => {
     const lastPage =`${path}?page=${lastPageNumber}`;
 
     return {
+        totalItems,
         numberPages,
         firstPage,
         previousPage,
