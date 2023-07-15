@@ -163,7 +163,7 @@ export class StockNoSerializable extends Context {
         WHERE a.id_estado IN ?
         ${andUser};`;
     const sqlSelect = `SELECT a.id, c.codigo, c.nombre as 'nombre', a.cantidad, a.fecha_cargue, a.fecha_actualizacion, 
-        a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario', a.id_usuario
+        a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario', a.id_usuario, a.id_material
         FROM ${StockNoSerializable.nameTable} as a 
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
         INNER JOIN MATERIAL as c on a.id_material = c.id
