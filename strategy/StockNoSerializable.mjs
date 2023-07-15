@@ -156,9 +156,12 @@ export class StockNoSerializable extends Context {
     const page = request.page ? Number(request.page) : 1;
     const totalPage = TOTAL_PAGE_PAGINATION;
     const offset = page * totalPage - totalPage;
+    const andUser = request.user ? "AND d.usuario IN ('"+request.user+"')" : "";
     const sqlCount = `SELECT COUNT(*) as Total
-        FROM ${StockNoSerializable.nameTable} as a 
-        WHERE a.id_estado IN ?;`;
+        FROM ${StockNoSerializable.nameTable} as a
+        LEFT JOIN USUARIO as d on a.id_usuario = d.id
+        WHERE a.id_estado IN ?
+        ${andUser};`;
     const sqlSelect = `SELECT a.id, c.codigo, c.nombre as 'nombre', a.cantidad, a.fecha_cargue, a.fecha_actualizacion, 
         a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario' 
         FROM ${StockNoSerializable.nameTable} as a 
@@ -166,6 +169,7 @@ export class StockNoSerializable extends Context {
         INNER JOIN MATERIAL as c on a.id_material = c.id
         LEFT JOIN USUARIO as d on a.id_usuario = d.id
         WHERE a.id_estado IN ?
+        ${andUser}
         ORDER BY a.fecha_cargue DESC
         LIMIT ${offset},${totalPage}`;
     const sqlString = sqlCount + sqlSelect;
