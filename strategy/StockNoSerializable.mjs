@@ -154,7 +154,7 @@ export class StockNoSerializable extends Context {
   }
   async getItem(request, callback) {
     const page = request.page ? Number(request.page) : 1;
-    const totalPage = TOTAL_PAGE_PAGINATION;
+    const totalPage = !!request.pageSize ? request.pageSize : TOTAL_PAGE_PAGINATION
     const offset = page * totalPage - totalPage;
     const andUser = request.user ? "AND d.usuario IN ('"+request.user+"')" : "";
     const sqlCount = `SELECT COUNT(*) as Total
