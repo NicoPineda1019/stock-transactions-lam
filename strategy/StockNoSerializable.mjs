@@ -4,7 +4,7 @@ import { paginateResponse, response } from "../utils/response.mjs";
 import { TOTAL_PAGE_PAGINATION } from "../constants.mjs";
 import { groupById } from "../utils/utils.mjs";
 export class StockNoSerializable extends Context {
-  static nameTable = 'INVENTARIO_NO_SERIALIZABLE'
+  static nameTable = "INVENTARIO_NO_SERIALIZABLE";
   constructor() {
     super();
     this.db = new DataBase();
@@ -14,12 +14,12 @@ export class StockNoSerializable extends Context {
     const idStock = request.idEstado;
     const idUser = request.idUsuario;
     const errorsList = [];
-    const skipUpdateAcumulator = !!request.skipUpdateAcumulator
+    const skipUpdateAcumulator = !!request.skipUpdateAcumulator;
     for (const infoMaterial of dataGroup) {
       // ALGORITHM AVOID UPDATE SIMULTANEOSTLY
       if (skipUpdateAcumulator) {
         await this.inserItem(request, infoMaterial);
-        continue
+        continue;
       }
       for (const triesTimeOut of [50, 100]) {
         let mustRetry = false;
@@ -110,10 +110,10 @@ export class StockNoSerializable extends Context {
       cantidad: newCuantity,
       fecha_actualizacion: request.fechaActualizacion,
       hora_actualizacion: request.horaActualizacion,
-      id_work:request.idWork,
-      account:request.account,
-      work_order:request.workOrder,
-      node:request.node
+      id_work: request.idWork,
+      account: request.account,
+      work_order: request.workOrder,
+      node: request.node,
     };
     const responseUpdate = await this.db
       .query(sqlUpdate, [values, [infoQuery.id], infoQuery.cantidad])
@@ -121,7 +121,9 @@ export class StockNoSerializable extends Context {
         console.log(
           `RESPONSE updateItem FOR ID_MATERIAL -> ${
             infoMaterial.idMaterial
-          } in table => ${StockNoSerializable.nameTable} : ${JSON.stringify(resp)}`
+          } in table => ${StockNoSerializable.nameTable} : ${JSON.stringify(
+            resp
+          )}`
         );
         return {
           rows: resp?.changedRows,
@@ -137,15 +139,15 @@ export class StockNoSerializable extends Context {
     return responseUpdate;
   }
   async inserItem(request, infoMaterial) {
-    const sqlString = `INSERT INTO ${StockNoSerializable.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, cantidad, id_estado, id_usuario, id_work, account, work_order,node) VALUES ?`;
+    const sqlString = `INSERT INTO ${StockNoSerializable.nameTable} SET ?`;
     const values = this.mapInsertItem(request, infoMaterial);
     await this.db
-      .query(sqlString, [[values]])
+      .query(sqlString, values)
       .then((resp) => {
         console.log(
-          `Response insertItem in table => ${StockNoSerializable.nameTable} : ${JSON.stringify(
-            resp
-          )}`
+          `Response insertItem in table => ${
+            StockNoSerializable.nameTable
+          } : ${JSON.stringify(resp)}`
         );
         return {
           code: 201,
@@ -162,9 +164,13 @@ export class StockNoSerializable extends Context {
   }
   async getItem(request, callback) {
     const page = request.page ? Number(request.page) : 1;
-    const totalPage = !!request.pageSize ? request.pageSize : TOTAL_PAGE_PAGINATION
+    const totalPage = !!request.pageSize
+      ? request.pageSize
+      : TOTAL_PAGE_PAGINATION;
     const offset = page * totalPage - totalPage;
-    const andUser = request.user ? "AND d.usuario IN ('"+request.user+"')" : "";
+    const andUser = request.user
+      ? "AND d.usuario IN ('" + request.user + "')"
+      : "";
     const sqlCount = `SELECT COUNT(*) as Total
         FROM ${StockNoSerializable.nameTable} as a
         LEFT JOIN USUARIO as d on a.id_usuario = d.id
@@ -213,19 +219,22 @@ export class StockNoSerializable extends Context {
     callback(null, response(responseQuery.code, responseQuery.msg));
   }
   mapInsertItem(request, extraData) {
-    return [
-      extraData.idMaterial,
-      `${request.fechaActualizacion} ${request.horaActualizacion}`,
-      request.fechaActualizacion,
-      request.horaActualizacion,
-      Number(extraData.cantidad),
-      request.idEstado,
-      request.idUsuario,
-      request?.idWork,
-      request?.account,
-      request?.workOrder,
-      request?.node
-    ];
+    const items = {
+      id_material: extraData.idMaterial,
+      fecha_cargue: `${request.fechaActualizacion} ${request.horaActualizacion}`,
+      fecha_actualizacion: request.fechaActualizacion,
+      hora_actualizacion: request.horaActualizacion,
+      cantidad: Number(extraData.cantidad),
+      id_estado: request.idEstado,
+      id_usuario: request.idUsuario,
+    };
+    if (request?.idWork) {
+      items["id_work"] = request.idWork;
+      items["account"] = request.account;
+      items["work_order"] = request.workOrder;
+      items["node"] = request.node;
+    }
+    return items;
   }
   mapGetItem(request) {
     const formatStates = request.idEstado.replaceAll(",", "");
