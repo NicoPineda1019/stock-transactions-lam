@@ -65,7 +65,7 @@ export class StockSerializable extends Context {
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
         INNER JOIN MATERIAL as c on a.id_material = c.id
         LEFT JOIN USUARIO as d on a.id_usuario = d.id
-        LEFT JOIN WORK as e on a.id_work = d.id
+        LEFT JOIN WORK as e on a.id_work = e.id
         WHERE a.id_estado IN ?
         ${andUser}
         ORDER BY a.fecha_cargue DESC
