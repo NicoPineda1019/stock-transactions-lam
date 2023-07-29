@@ -14,8 +14,13 @@ export class StockNoSerializable extends Context {
     const idStock = request.idEstado;
     const idUser = request.idUsuario;
     const errorsList = [];
+    const skipUpdateAcumulator = !!request.skipUpdateAcumulator
     for (const infoMaterial of dataGroup) {
       // ALGORITHM AVOID UPDATE SIMULTANEOSTLY
+      if (skipUpdateAcumulator) {
+        await this.inserItem(request, infoMaterial);
+        continue
+      }
       for (const triesTimeOut of [50, 100]) {
         let mustRetry = false;
         const responseQuery = await this.getItemByConditions(
