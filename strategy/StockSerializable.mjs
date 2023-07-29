@@ -103,7 +103,12 @@ export class StockSerializable extends Context {
             fecha_actualizacion: request.fechaActualizacion,
             hora_actualizacion: request.horaActualizacion,
             id_estado: request.idEstado,
-            id_usuario: request.idUsuario
+            id_usuario: request.idUsuario,
+            id_work:request.idWork,
+            account:request.account,
+            work_order:request.workOrder,
+            node:request.node
+
         }
     }
     mapMultipleId(idArray) {
