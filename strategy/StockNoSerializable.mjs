@@ -110,6 +110,10 @@ export class StockNoSerializable extends Context {
       cantidad: newCuantity,
       fecha_actualizacion: request.fechaActualizacion,
       hora_actualizacion: request.horaActualizacion,
+      id_work:request.idWork,
+      account:request.account,
+      work_order:request.workOrder,
+      node:request.node
     };
     const responseUpdate = await this.db
       .query(sqlUpdate, [values, [infoQuery.id], infoQuery.cantidad])
@@ -133,9 +137,8 @@ export class StockNoSerializable extends Context {
     return responseUpdate;
   }
   async inserItem(request, infoMaterial) {
-    const sqlString = `INSERT INTO ${StockNoSerializable.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, cantidad, id_estado, id_usuario) VALUES ?`;
+    const sqlString = `INSERT INTO ${StockNoSerializable.nameTable} (id_material, fecha_cargue, fecha_actualizacion, hora_actualizacion, cantidad, id_estado, id_usuario, id_work, account, work_order,node) VALUES ?`;
     const values = this.mapInsertItem(request, infoMaterial);
-    console.log("values", values);
     await this.db
       .query(sqlString, [[values]])
       .then((resp) => {
@@ -169,11 +172,13 @@ export class StockNoSerializable extends Context {
         AND a.cantidad > 0
         ${andUser};`;
     const sqlSelect = `SELECT a.id, c.codigo, c.nombre as 'nombre', a.cantidad, a.fecha_cargue, a.fecha_actualizacion, 
-        a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario', a.id_usuario, a.id_material
+        a.hora_actualizacion, b.nombre as 'estado', d.nombre as 'usuario', a.id_usuario, a.id_material, e.nombre as 'work',
+        a.account, a.work_order, a.node
         FROM ${StockNoSerializable.nameTable} as a 
         INNER JOIN ESTADO as b ON a.id_estado = b.id 
         INNER JOIN MATERIAL as c on a.id_material = c.id
         LEFT JOIN USUARIO as d on a.id_usuario = d.id
+        LEFT JOIN WORK as e on a.id_work = e.id
         WHERE a.id_estado IN ?
         ${andUser}
         AND a.cantidad > 0
@@ -216,6 +221,10 @@ export class StockNoSerializable extends Context {
       Number(extraData.cantidad),
       request.idEstado,
       request.idUsuario,
+      request?.idWork,
+      request?.account,
+      request?.workOrder,
+      request?.node
     ];
   }
   mapGetItem(request) {

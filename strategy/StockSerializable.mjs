@@ -110,7 +110,6 @@ export class StockSerializable extends Context {
             account:request.account,
             work_order:request.workOrder,
             node:request.node
-
         }
     }
     mapMultipleId(idArray) {
