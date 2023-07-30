@@ -1,0 +1,1 @@
+export const TOTAL_PAGE_PAGINATION = 50
