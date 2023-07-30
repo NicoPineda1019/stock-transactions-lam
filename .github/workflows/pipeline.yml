@@ -46,9 +46,9 @@ jobs:
           --timeout 90 \
           --runtime nodejs${{ matrix.node-version }} \
           --environment '{"Variables":{
-            "DB_ENDPOINT": ${{ secrets.DEV_DATABASE_ENDPOINT }},
-            "DB_USER": ${{ secrets.DATABASE_USER }},
-            "DB_PASSWORD": ${{ secrets.DEV_DATABASE_PASSWORD }},
+            "DB_ENDPOINT": '${{ secrets.DEV_DATABASE_ENDPOINT }}',
+            "DB_USER": '${{ secrets.DATABASE_USER }}',
+            "DB_PASSWORD": '${{ secrets.DEV_DATABASE_PASSWORD }}',
             "DB_SCHEMA": "db-capired-dev"}}' \
           --layers arn:aws:lambda:us-east-1:227205496403:layer:mysql-layer:2 \
           arn:aws:lambda:us-east-1:227205496403:layer:xlsx:1 \
