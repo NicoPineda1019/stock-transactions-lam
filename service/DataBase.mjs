@@ -1,9 +1,9 @@
 import mysql from 'mysql';
 const dB = mysql.createConnection({
-    host: 'stock-capired.cu68nawuqxr9.us-east-1.rds.amazonaws.com',
-    user: 'admin',
-    password: 'CapiredStock2023*',
-    database: 'db-capired-dev',
+    host: process.env.DB_ENDPOINT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_SCHEMA,
     multipleStatements: true
 })
 
